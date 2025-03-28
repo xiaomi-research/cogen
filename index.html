@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoGen: 3D Consistent Video Generation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #fcfcfc;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background-color: #fff;
+            padding: 3rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 3.0rem;
+            margin-bottom: 2.5rem;
+            color: #151e27;
+            font-weight: 600;
+        }
+
+        .authors {
+            color: #1b1b1b;
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .affiliations {
+            color: #1b1b1b;
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+            margin-top: 0.2rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-weight: 400;
+        }
+        
+        .email {
+            color: #1b1b1b;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+            margin-top: 0.2rem;
+            font-family: sans-serif;
+            font-weight: 400;
+        }
+        
+        sup {
+            font-size: 0.75em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+            top: -0.5em;
+        }
+
+        .abstract {
+            padding: 1rem 0;
+            margin: 2rem auto;
+            max-width: 1000px;
+            position: relative;
+            
+        }
+
+        .abstract:not(:last-child):after {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 0;
+            width: 100%;
+            border-bottom: 1px solid #ddd; 
+        }
+
+        .abstract h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            text-align: center;
+        }
+
+        .container-abstract {
+            color: #2c3e50;
+            max-width: 800px;
+            font-size: 1.0rem; 
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: justify;
+        }
+
+        .demo-section {
+            padding: 1rem 0;
+            margin: 2rem auto;
+            max-width: 1000px;
+            position: relative;
+        }
+
+        .demo-section:not(:last-child):after {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 0;
+            width: 100%;
+            border-bottom: 1px solid #ddd; 
+        }
+
+        .demo-section h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem; 
+            font-weight: bold; 
+        }
+
+        .video-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .video-container {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .video-container video {
+            width: 90%; 
+        }
+
+        .figure-container {
+            margin: 2rem auto;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .figure-container img {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .figure-container p {
+            margin-top: 1rem;
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 100%;
+            text-align: left;
+        }
+
+        .figures-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem auto;
+            max-width: 1000px;
+        }
+        
+        .figures-row .figure-container {
+            margin: 0;
+            flex: 1;
+        }
+        
+        .figures-row .figure-container img {
+            height: 300px; 
+            width: auto;
+            object-fit: contain; 
+            max-width: 100%; 
+        }
+        
+        .figures-row .figure-container p {
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            text-align: left;
+        }
+
+        .footnote {
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            font-style: italic;
+        }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <h1>CoGen: 3D Consistent Video Generation via Adaptive Conditioning for Autonomous Driving</h1>
+        <div class="authors">
+            Yishen Ji<sup>1,2</sup> &nbsp; Ziyue Zhu<sup>2,3</sup> &nbsp; Zhenxin Zhu<sup>2</sup> &nbsp; Kaixin Xiong<sup>2</sup> &nbsp; Ming Lu<sup>4</sup> &nbsp; Zhiqi Li<sup>1</sup><br>
+            Lijun Zhou<sup>2,†</sup> &nbsp; Haiyang Sun<sup>2,†</sup> &nbsp; Bing Wang<sup>2,✉</sup> &nbsp; Tong Lu<sup>1,✉</sup>
+        </div>
+        <div class="affiliations">
+            <span><sup>1</sup>Nanjing University</span>
+            <span><sup>2</sup>Xiaomi EV</span>
+            <span><sup>3</sup>Nankai University</span>
+            <span><sup>4</sup>Peking University</span>
+        </div>
+        <div class="email">
+            jiyishen929@gmail.nju.edu.cn <br>
+        </div>
+        <div class="email">
+            <sup>†</sup>project leader. <sup>✉</sup>corresponding author.
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="abstract">
+            <h2>Abstract</h2>
+            
+            <div class="container-abstract"><p>Recent progress in driving video generation has shown significant potential for enhancing self-driving systems by providing scalable and controllable training data. Although pretrained state-of-the-art generation models, guided by 2D layout conditions (e.g., HD maps and bounding boxes), can produce photorealistic driving videos, achieving controllable multi-view videos with high 3D consistency remains a major challenge. To tackle this, we introduce a novel spatial adaptive generation framework, CoGen, which leverages advances in 3D generation to improve performance in two key aspects: (i) To ensure 3D consistency, we first generate high-quality, controllable 3D conditions that capture the geometry of driving scenes. By replacing coarse 2D conditions with these fine-grained 3D representations, our approach significantly enhances the spatial consistency of the generated videos. (ii) Additionally, we introduce a consistency adapter module to strengthen the robustness of the model to multi-condition control. The results demonstrate that this method excels in preserving geometric fidelity and visual realism, offering a reliable video generation solution for autonomous driving.</p></div>
+        </section>
+
+        <section class="demo-section">
+            <h2>Model</h2>
+            <div class="figure-container">
+                <img src="assets/figures/model.png" alt="Model Architecture">
+                <p>Overview of our model. (a) Training and inference pipeline. Using BEV maps as conditions, we generate temporal 3D semantics sequences, which are then projected and encoded to provide guidance for video generation. During projection, a foreground object mask is created and incorporated into training with a foreground mask loss reweight, enhancing supervision for foreground generation quality. (b) Details of 3D semantics projection and encoding. Various forms of guidance are fused through 1 × 1 convolutions. (c) Illustration of our diffusion transformer architecture.</p>
+            </div>
+            <div class="figure-container">
+                <img src="assets/figures/vis_condition.png" alt="Visualization of the generated 3D conditions">
+                <p>Visualization of the 3d semantics conditions used for video generation. Each condition is derived by projecting the 3D semantics grid into the camera view using ray casting, capturing essential geometric and semantic information for enhanced video generation.</p>
+            </div>
+        </section>
+
+        <section class="demo-section">
+            <h2>Video Demos</h2>
+            <div class="video-grid">
+                <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/a4782f7ade234010b5b50553403f6e79_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/94cd383effba4e688570233a060a13f4_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/0f39f34febc84a6689f08599105d1421_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/3abf81a7c3894000a4c508e6ced0caca_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/63e3bc947eed4823b00e1beadecd3be3_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <!-- <div class="video-container">
+                    <video controls>
+                        <source src="assets/demo_videos/9699d6a8d9384f8885e8c5318bc621ab_12fps_re.mp4" type="video/mp4">
+                    </video>
+                </div> -->
+            </div>
+        </section>
+
+        <section class="demo-section">
+            <h2>Main Results</h2>
+            <div class="figures-row">
+                <div class="figure-container">
+                    <img src="assets/figures/results.png" alt="Results">
+                    <p>Quantitative comparison on video generation quality with other methods. Our method achieves the best FVD score.</p>
+                </div>
+                <div class="figure-container">
+                    <img src="assets/figures/controllability.png" alt="Controllability">
+                    <p>Comparison with baselines for video generation controllability. Results are calculated with first 16 frames of videos.</p>
+                </div>
+            </div>
+
+            <h2>Ablation Study</h2>
+            <div class="figure-container">
+                <img src="assets/figures/w_and_wo_mask_loss.png" alt="Mask Loss">
+                <p>Qualitative visualization of 3D semantics Mask Loss's effects. </p>
+            </div>
+            <div class="figures-row">
+                <div class="figure-container">
+                    <img src="assets/figures/fvd_comparison_all.png" alt="FVD Comparison">
+                    <p>FVD scores comparison for different model settings. Incorporating the adapter consistently lowers FVD across 8, 16, 28, and 40 frame sequences.</p>
+                </div>
+                <div class="figure-container">
+                    <img src="assets/figures/ablation.png" alt="Ablation Study">
+                    <p>'Sem Dep' denotes Semantic Map and Depth Map, while 'MPI Coor' refers to MPI and Coordinate Map. 'Adapter' indicates the consistency adapter, and '3D-Sem' represents 3D semantics-based guidance (GT for ground truth, GEN for our generated 3D semantics).</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
